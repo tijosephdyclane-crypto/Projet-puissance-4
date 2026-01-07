@@ -9,20 +9,20 @@
 
 /* Prototypes */
 void init_grid(int g[ROWS][COLS]);
-void print_grid(int g[ROWS][COLS]);
-int drop_piece(int g[ROWS][COLS], int col, int player); /* retourne la ligne où le pion a été placé, ou -1 si impossible */
+void display_grid(int g[ROWS][COLS]);
+int drop_token(int g[ROWS][COLS], int col, int player); /* retourne la ligne où le pion a été placé, ou -1 si impossible */
 bool is_valid_column(int g[ROWS][COLS], int col);
 bool is_grid_full(int g[ROWS][COLS]);
 bool check_win(int g[ROWS][COLS], int last_row, int last_col, int player);
-int get_player_move(int player);
-int menu_choice(void);
+int switch_player(int player);
+int display_menu(void);
 
 int main(void) {
     int grid[ROWS][COLS];
     int choice;
 
     while (1) {
-        choice = menu_choice();
+        choice = display_menu();
         if (choice == 2) {
             printf("Au revoir !\n");
             break;
@@ -31,20 +31,20 @@ int main(void) {
             int current_player = 1;
             bool game_over = false;
 
-            print_grid(grid);
+            display_grid(grid);
 
             while (!game_over) {
                 printf("Joueur %d, à vous de jouer.\n", current_player);
-                int col = get_player_move(current_player);
+                int col = switch_player(current_player);
 
                 /* tenter de déposer la pièce */
-                int row = drop_piece(grid, col, current_player);
+                int row = drop_token(grid, col, current_player);
                 if (row == -1) {
                     printf("Colonne %d pleine ou invalide, réessayez.\n", col);
                     continue; /* rejouer le même joueur */
                 }
 
-                print_grid(grid);
+                display_grid(grid);
 
                 if (check_win(grid, row, col, current_player)) {
                     printf("Félicitations ! Le joueur %d a gagné !\n", current_player);
@@ -75,7 +75,7 @@ void init_grid(int g[ROWS][COLS]) {
 }
 
 /* Affiche la grille en ASCII, avec numéro des colonnes (0..6) */
-void print_grid(int g[ROWS][COLS]) {
+void display_grid(int g[ROWS][COLS]) {
     printf("\n  ");
     for (int c = 0; c < COLS; c++) {
         printf(" %d ", c);
@@ -108,7 +108,7 @@ bool is_valid_column(int g[ROWS][COLS], int col) {
 
 /* Dépose un pion du joueur dans la colonne col.
    Retourne la ligne (0..ROWS-1) où le pion est placé, ou -1 si impossible. */
-int drop_piece(int g[ROWS][COLS], int col, int player) {
+int drop_token(int g[ROWS][COLS], int col, int player) {
     if (!is_valid_column(g, col)) return -1;
     for (int r = ROWS - 1; r >= 0; r--) {
         if (g[r][col] == 0) {
@@ -170,7 +170,7 @@ bool check_win(int g[ROWS][COLS], int last_row, int last_col, int player) {
 
 /* Lit et valide le choix de colonne du joueur (0..6).
    Réessaye en cas d'entrée invalide (non-numérique ou hors plage). */
-int get_player_move(int player) {
+int switch_player(int player) {
     char buf[128];
     long val;
     char *endptr;
@@ -203,7 +203,7 @@ int get_player_move(int player) {
 
 /* Affiche le menu principal et retourne le choix :
    1 = Lancer une partie, 2 = Quitter */
-int menu_choice(void) {
+int display_menu(void) {
     char buf[128];
     while (1) {
         printf("=== Puissance 4 (console) ===\n");
